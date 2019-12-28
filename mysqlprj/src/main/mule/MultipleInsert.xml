@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="MultipleInsertFlow" doc:id="10c7bc14-acee-49cb-833e-003babe47ad2" >
+		<http:listener doc:name="Listener" doc:id="7a6b2356-22f1-4bb7-8f40-16683b4f39eb" config-ref="HTTP_Listener_config" path="/MultipleInsert" outputMimeType="application/json" allowedMethods="POST">
+			<http:response >
+				<http:body ><![CDATA[#[output application/json --- "Message":"Record inserted"]]]></http:body>
+			</http:response>
+			<http:error-response >
+				<http:body ><![CDATA[#[output application/json --- payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<ee:transform doc:name="Transform Message" doc:id="e389bfda-fa8a-413f-aceb-ae2dde2b1a32" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload.*emp map((val,ind)->
+	  {
+		ineno:val.empno as Number,
+		inename:val.empname,
+		inecity:val.empcity
+		}
+)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<db:bulk-insert doc:name="Bulk insert" doc:id="df90b522-853d-4384-a022-512d1c8f2d80" >
+			<db:sql >INSERT INTO EMPLOYEE(ENO,ENAME,ECITY) VALUES(:ineno,:inename,:inecity)</db:sql>
+		</db:bulk-insert>
+	</flow>
+</mule>

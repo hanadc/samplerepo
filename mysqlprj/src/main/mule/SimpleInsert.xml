@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<db:config name="Database_Config2" doc:name="Database Config" doc:id="1e982e99-d3e1-4d74-9844-4002a3793bf7" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="Mhw@8137355609" database="sample" />
+	</db:config>
+	<flow name="SimpleInsertFlow" doc:id="ad8f7e02-98a4-4968-9a5b-0eb6d4c654d0" >
+		<http:listener doc:name="Listener" doc:id="45130b69-14e7-4115-b0f3-dc6f0b8aa21c" config-ref="HTTP_Listener_config" allowedMethods="POST" path="/SimpleInsert" outputMimeType="application/json">
+			<http:response >
+				<http:body ><![CDATA[#[output application/json --- "message":"One record inserted(offcourse Hardcoded one"]]]></http:body>
+			</http:response>
+			<http:error-response >
+				<http:body ><![CDATA[#[output application/json --- payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<db:insert doc:name="Insert" doc:id="de3503c2-97bc-4bd7-9145-b857639b1782" config-ref="Database_Config2">
+			<db:sql >INSERT INTO EMPLOYEE(ENO,ENAME,ECITY) VALUES(:INENO,:INENAME,:INECITY)</db:sql>
+			<db:input-parameters ><![CDATA[#[{INENO:payload.empno,INENAME:payload.empname,INECITY:payload.empcity}]]]></db:input-parameters>
+		</db:insert>
+	</flow>
+</mule>

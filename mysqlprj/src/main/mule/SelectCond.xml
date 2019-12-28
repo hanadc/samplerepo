@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<db:config name="Database_Config1" doc:name="Database Config" doc:id="b0ab5456-8caa-40aa-b666-21defd5c4cbd" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="Mhw@8137355609" database="sample" />
+	</db:config>
+	<flow name="SelectCondFlow" doc:id="a5d87495-64cf-4b34-98b5-dd628842f7eb" >
+		<http:listener doc:name="Listener" doc:id="08f9b2ff-be54-490d-af66-53a21044a96e" config-ref="HTTP_Listener_config" path="/SelectCond" outputMimeType="text/html" allowedMethods="GET">
+			<http:response >
+				<http:body ><![CDATA[#[output application/Json --- payload]]]></http:body>
+			</http:response>
+			<http:error-response >
+				<http:body ><![CDATA[#[output text/plain --- payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<set-variable value="#[attributes.queryParams.eid]" doc:name="Set Variable" doc:id="814a1c5e-5aee-4c06-b0c8-88c6258207c8" variableName="ineid"/>
+		<db:select doc:name="Select" doc:id="e8f22e04-b698-4736-989a-d4ca6964f821" config-ref="Database_Config1">
+			<db:sql >SELECT * FROM EMPLOYEE WHERE ENO IN(:INENO)</db:sql>
+			<db:input-parameters ><![CDATA[{INENO:vars.ineid}]]></db:input-parameters>
+		</db:select>
+	</flow>
+</mule>
